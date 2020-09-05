@@ -53,6 +53,10 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+        'authInterceptorFileAccess' => \App\Http\Middleware\AuthInterceptorFileAccess::class,
+        'authInterceptorPublisher' => \App\Http\Middleware\AuthInterceptorPublisher::class,
+        'authInterceptorAdmin' => \App\Http\Middleware\AuthInterceptorAdmin::class,
+        'authInterceptorReader' => \App\Http\Middleware\AuthInterceptorReader::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
