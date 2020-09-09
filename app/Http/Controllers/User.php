@@ -7,53 +7,40 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-class User extends Controller
-{
-    public function getUserList()
-	{
-		error_log('i am user list');
+class User extends Controller {
+
+    public function getUserList() {
+		error_log('User::getUserList');
 		return DB::table('users')->get();
 	}
 
-	public function insertUser(Request $req)
-	{
-	
-		error_log('CreateUser');
+	public function insertUser(Request $req) {
+		error_log('User::insertUser');
 
 		$name = $req->input('name');
 		$role = $req->input('role');
-		$mobileNo = $req->input('mobile_no');
+		$mobileNo = $req->input('mobileNo');
 		$password = $req->input('password');
 
-		error_log($name);
-		error_log($role);
-		error_log($mobileNo);
-		error_log($password);
-			
 		$check = $role;
 
-		error_log('Going in If');
-		if( $check == 'READER'){
-			error_log('i m in reader');
+		if( $check == 'READER') {
 			$user= DB::table('users')
 			->insert([
 				'name' => $name,
 				'role' => $role,
-				'mobile_no' => $mobileNo,
+				'mobileNo' => $mobileNo,
 				'password' => $password,
 			]);
-		}else if(  $check == 'PUBLISHER' )
-		{
-			error_log('i m in publisher');
+		} else if(  $check == 'PUBLISHER' ) {
 			$fileName = $req->file('file')->store('Uploads');
-			error_log($fileName);
 			$user= DB::table('users')
 			
 			->insert(
 			[
 				'name' => $name,
 				'role' => $role,
-				'mobile_no' => $mobileNo,
+				'mobileNo' => $mobileNo,
 				'password' => $password,
 				'fileName' => $fileName,
 			]
@@ -62,11 +49,8 @@ class User extends Controller
 
 	}
 
-	public function deleteUser(Request $req, $userId)
-	{
-	
-		error_log('DeleteUser');
-		error_log($userId);
+	public function deleteUser(Request $req, $userId) {
+		error_log('User::deleteUser');
 		$data = $req->json()->all();
 
 		$user= DB::table('users')
@@ -77,13 +61,10 @@ class User extends Controller
 	   // $data['id']
 	}
 
-	public function updateUserStatus(Request $req, $userId, $newStatus)
-	{
-		error_log($userId);
-		error_log($newStatus);
+	public function updateUserStatus(Request $req, $userId, $newStatus) {
+		error_log('User::updateUserStatus');
 
-		if($newStatus == "ACTIVE" || $newStatus == "INACTIVE")
-		{
+		if($newStatus == "ACTIVE" || $newStatus == "INACTIVE") {
 			return DB::table('users')
 			->where('id',$userId)
 			->update([
@@ -92,49 +73,54 @@ class User extends Controller
 		}
 	}	
 
-	public function userAuthenticate(Request $req)
-	{
+	public function userAuthenticate(Request $req) {
+		error_log('User::userAuthenticate');
 		$random = str_random(30);
-		error_log($random);
-
 		$data = $req->input();
 
+		error_log('Mobile No: ' . $data['mobileNo'].' Password: ' . $data['password']);
+
 		$statusArr = DB::table('users')
-				->where('mobile_no',$data['mobileNo'])
-				->where('password',$data['password'])
+				->where('mobileNo', $data['mobileNo'])
+				->where('password', $data['password'])
 				->pluck('status');
 
-		if(count($statusArr) == 1 && $statusArr[0]=='ACTIVE'){
-
-			DB::table('users')
-			->where('status','ACTIVE')
-			->where('mobile_no',$data['mobileNo'])
-			->where('password',$data['password'])
-			->update([
-				'token' => $random
-			]);
-
-			$sql = DB::table('users')
-				->where('mobile_no',$data['mobileNo'])
-				->where('password',$data['password'])
-				->get();
-
-		return $sql;
+		if(count($statusArr) != 1) {
+			error_log('Invalid User Details');
+			return "Invalid User Details";
 		}
 
-		return "User Not Active";
+		if($statusArr[0]=='ACTIVE') {
+			DB::table('users')
+				->where('status','ACTIVE')
+				->where('mobileNo', $data['mobileNo'])
+				->where('password', $data['password'])
+				->update([
+					'token' => $random
+				]);
+
+			$sql = DB::table('users')
+				->where('mobileNo', $data['mobileNo'])
+				->where('password', $data['password'])
+				->get();
+
+			error_log('Token Generated: ' . $random);
+			return $sql;
+		} else {
+			error_log('Inactive User Account');
+			return "Inactive User Account";
+		}
+
 	}
 
 	public function viewImage(Request $req, $fileName) {
-		error_log('ViewImage');
+		error_log('User::viewImage');
 		return Storage::Response('Uploads/' . $fileName);
 	}
 
-	public function getProfileData(Request $req)
-	{
-		error_log("GetProfileData");
+	public function getProfileData(Request $req) {
+		error_log('User::getProfileData');
 		$userId = $req->header('user_id');
-		error_log($userId);
 
 		return $profileData = DB::table('users')
 				->where('id',$userId)
@@ -142,9 +128,8 @@ class User extends Controller
 		
 	}
 	
-	public function updateProfile(Request $req)
-	{
-		error_log("UpdateProfile");
+	public function updateProfile(Request $req) {
+		error_log('User::updateProfile');
 		return null;
 	}
 }

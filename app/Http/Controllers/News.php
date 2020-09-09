@@ -9,72 +9,68 @@ use App\File;
 use Illuminate\Support\Facades\File as LaraFile;
 use Illuminate\Support\Facades\Storage;
 
-class News extends Controller
-{
+class News extends Controller {
+
     public function getAllPublishedNews() {
+		error_log('News::getAllPublishedNews');
 
 		$rs = DB::table('news')
-				->select('news.id as id',
-						'user.name as publisherName',
-						'news.title as title',
-						'news.content as content',
-						'user.id as publisherId',
-						'news.fileName as fileName',
-						'news.adminApproval as adminApproval',
-						'news.publisherApproval as publisherApproval',
-						'news.countView as countView',
-						'news.time as time',)
-				->join('user','news.uploaderId','=','user.id')
-				->get();
+					->select('news.id as id',
+							'user.name as publisherName',
+							'news.title as title',
+							'news.content as content',
+							'user.id as publisherId',
+							'news.fileName as fileName',
+							'news.adminApproval as adminApproval',
+							'news.publisherApproval as publisherApproval',
+							'news.countView as countView',
+							'news.time as time',)
+					->join('user','news.uploaderId','=','user.id')
+					->get();
 
 		return $rs;
 	}
 
 	public function getMyPublishedNews(Request $req) {
-
-		error_log('message');
+		error_log('News::getMyPublishedNews');
 		$userId = $req->header('user_id');
-		error_log($userId);
 		
 		$rs = DB::table('news')
-				->select('news.id as id',
-						'news.publisherId as publisherId',
-						'news.title as title',
-						'news.fileName as fileName',
-						'news.adminApproval as adminApproval',
-						'news.publisherApproval as publisherApproval',
-						'news.countView as countView')
-				->where('news.publisherId', $userId)
-				->get();
+					->select('news.id as id',
+							'news.publisherId as publisherId',
+							'news.title as title',
+							'news.fileName as fileName',
+							'news.adminApproval as adminApproval',
+							'news.publisherApproval as publisherApproval',
+							'news.countView as countView')
+					->where('news.publisherId', $userId)
+					->get();
 
 		return $rs;
 	}
 
 	public function getAllActiveNews(Request $req) {
-
-		error_log('message');
+		error_log('News::getAllActiveNews');
 		
 		$rs = DB::table('news')
-				->select('news.id as id',
-						'news.publisherId as publisherId',
-						'news.title as title',
-						'news.fileName as fileName',
-						'news.adminApproval as adminApproval',
-						'news.publisherApproval as publisherApproval',
-						'news.countView as countView')
-				->where('news.adminApproval', 1)
-				->where('news.publisherApproval', 1)
-				->get();
+					->select('news.id as id',
+							'news.publisherId as publisherId',
+							'news.title as title',
+							'news.fileName as fileName',
+							'news.adminApproval as adminApproval',
+							'news.publisherApproval as publisherApproval',
+							'news.countView as countView')
+					->where('news.adminApproval', 1)
+					->where('news.publisherApproval', 1)
+					->get();
 
 		return $rs;
 	}
 
 	public function insertNews(Request $req) {
-	
-		error_log('InsertNews');
+		error_log('News::insertNews');
 		$fileName = $req->file('file')->store('Uploads');
 		echo $fileName;
-
 
 		$newsTitle = $req->input('title');
 		$newsContent = $req->input('content');
@@ -94,95 +90,72 @@ class News extends Controller
 	}
 
 	public function deleteNews(Request $req, $newsId) {
-		error_log('DeleteNews');
-		error_log($newsId);
-
+		error_log('News::deleteNews');
 		$fileName = DB::table('news')->where('id', $newsId)->pluck('fileName');
-
-		error_log($fileName[0]);
-
-		error_log("Removing"); 
-		//unlink(storage_path('app/'.$filename[0]));
 		Storage::delete($fileName[0]);
-		error_log("Deleted"); 
-
+		
 		$user= DB::table('news')
-		->where('id', $newsId)
-		->delete();
+					->where('id', $newsId)
+					->delete();
 	}
 
 	public function downloadNews(Request $req, $fileName) {
-		error_log('DownloadNews');
+		error_log('News::downloadNews');
 		$newsTitle = $req->input('title');
-		error_log($fileName);
-		error_log($newsTitle);
 
 		$increment = DB::table('news')
-		->where('fileName', 'Uploads/'.$fileName)
-		->increment('countDownload', 1);
+							->where('fileName', 'Uploads/'.$fileName)
+							->increment('countDownload', 1);
 
 		return Storage::download('Uploads/' . $fileName , $newsTitle . '.png');
 	}
 
 	public function searchNews(Request $req) {
-		error_log('SearchNews1');
-		error_log($req);
+		error_log('News::searchNews');
 		$data = $req->input('searchString');
-		error_log('SearchNews2');
 
-		error_log($data);
-		error_log('SearchNews3');
-
-		error_log('before query');
 		$wantedNews = DB::table('news')
-		->where('title', 'LIKE' , '%'.$data.'%')
-		->where('news.adminApproval', 1)
-		->where('news.publisherApproval', 1)
-		->get();
-		error_log('after query');
-		error_log('after wanted called');
+							->where('title', 'LIKE' , '%'.$data.'%')
+							->where('news.adminApproval', 1)
+							->where('news.publisherApproval', 1)
+							->get();
 
 		return $wantedNews;
 	}
 
 	public function viewNews(Request $req, $fileName) {
-		error_log('ViewNews');
+		error_log('News::viewNews');
 
 		$increment = DB::table('news')
-		->where('fileName', 'Uploads/'.$fileName)
-		->increment('countView', 1);
+							->where('fileName', 'Uploads/'.$fileName)
+							->increment('countView', 1);
 
 		return Storage::Response('Uploads/' . $fileName);
 	}
 
 	public function updateNewsAdminStatus(Request $req, $newsId, $adminStatus) {
-		error_log($newsId);
-		error_log($adminStatus);
+		error_log('News::updateNewsAdminStatus');
 
-		if($adminStatus == 1 || $adminStatus == 0)
-		{
+		if($adminStatus == 1 || $adminStatus == 0) {
 			return DB::table('news')
-			->where('id',$newsId)
-			->update([
-				'adminApproval'=> $adminStatus
-			]);
+							->where('id',$newsId)
+							->update([
+								'adminApproval'=> $adminStatus
+							]);
 		}
 	}	
 
 	public function updateNewsPublisherStatus(Request $req, $newsId, $publisherStatus) {
-		error_log($newsId);
-		error_log($publisherStatus);
-
+		error_log('News::updateNewsPublisherStatus');
 		$userId = $req->header('user_id');
 
-		if($publisherStatus == 1 || $publisherStatus == 0)
-		{
+		if($publisherStatus == 1 || $publisherStatus == 0) {
 			return DB::table('news')
-			->where('id',$newsId)
-			->where('publisherId', $userId)
-			->update([
-				'publisherApproval'=> $publisherStatus
-			]);
+							->where('id',$newsId)
+							->where('publisherId', $userId)
+							->update([
+								'publisherApproval'=> $publisherStatus
+							]);
 		}
 	}
 }
