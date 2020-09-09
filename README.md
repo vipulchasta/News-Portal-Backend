@@ -27,7 +27,8 @@ Run `php artisan migrate` for creating required tables.
 
 Run `php artisan serve` for running the REST server. 
 
-Navigate to `http://localhost:8000/` for verification, if not able to access run `php artisan key:generate` then run `php artisan serve`.
+Navigate to `http://localhost:8000/` for verification. 
+If you face some token issue then run `php artisan key:generate` now `php artisan serve` should work fine.
 
 
 ## Further help
