@@ -25,7 +25,10 @@ Run `php artisan migrate` for creating required tables.
 
 ## Running server
 
-Run `php artisan serve` for running the REST server. Navigate to `http://localhost:6001/`.
+Run `php artisan serve` for running the REST server. 
+
+Navigate to `http://localhost:8000/` for verification, if not able to access run `php artisan key:generate` then run `php artisan serve`.
+
 
 ## Further help
 
