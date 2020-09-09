@@ -17,7 +17,7 @@ Run `composer install` or `composer.phar install` for downloading dependencies l
 Update .env file with database username and password -> by default confugured as
     db_name:  news_portal
     username: root
-    password: '' <Blank>
+    password: Blank
 
 Create news_portal using phpmyadmin.
 
