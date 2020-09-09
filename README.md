@@ -12,6 +12,17 @@ Run `cd News-Portal-Backend`.
 
 Run `composer install` or `composer.phar install` for downloading dependencies locally.
 
+## Database Setup
+
+Update .env file with database username and password -> by default confugured as
+    db_name:  news_portal
+    username: root
+    password: '' <Blank>
+
+Create news_portal using phpmyadmin.
+
+Run `php artisan migrate` for creating required tables.
+
 ## Running server
 
 Run `php artisan serve` for running the REST server. Navigate to `http://localhost:6001/`.
