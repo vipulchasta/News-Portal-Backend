@@ -16,18 +16,17 @@ class News extends Controller {
 
 		$rs = DB::table('news')
 					->select('news.id as id',
-							'user.name as publisherName',
+							'users.name as publisherName',
 							'news.title as title',
 							'news.content as content',
-							'user.id as publisherId',
+							'users.id as publisherId',
 							'news.fileName as fileName',
 							'news.adminApproval as adminApproval',
 							'news.publisherApproval as publisherApproval',
 							'news.countView as countView',
 							'news.time as time',)
-					->join('user','news.uploaderId','=','user.id')
+					->join('users','news.publisherId','=','users.id')
 					->get();
-
 		return $rs;
 	}
 
@@ -42,7 +41,8 @@ class News extends Controller {
 							'news.fileName as fileName',
 							'news.adminApproval as adminApproval',
 							'news.publisherApproval as publisherApproval',
-							'news.countView as countView')
+							'news.countView as countView',
+							'news.time as time')
 					->where('news.publisherId', $userId)
 					->get();
 
