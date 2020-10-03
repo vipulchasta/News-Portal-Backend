@@ -61,7 +61,8 @@ class News extends Controller {
 							'news.fileName as fileName',
 							'news.adminApproval as adminApproval',
 							'news.publisherApproval as publisherApproval',
-							'news.countView as countView')
+							'news.countView as countView',
+							'news.time as time')
 					->where('news.adminApproval', 1)
 					->where('news.publisherApproval', 1)
 					->get();
