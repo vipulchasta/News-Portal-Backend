@@ -24,8 +24,9 @@ class News extends Controller {
 							'news.adminApproval as adminApproval',
 							'news.publisherApproval as publisherApproval',
 							'news.countView as countView',
-							'news.time as time',)
+							'news.time as time')
 					->join('users','news.publisherId','=','users.id')
+					->orderBy('news.time', 'desc')
 					->get();
 		return $rs;
 	}
@@ -45,6 +46,7 @@ class News extends Controller {
 							'news.countView as countView',
 							'news.time as time')
 					->where('news.publisherId', $userId)
+					->orderBy('news.time', 'desc')
 					->get();
 
 		return $rs;
@@ -65,6 +67,7 @@ class News extends Controller {
 							'news.time as time')
 					->where('news.adminApproval', 1)
 					->where('news.publisherApproval', 1)
+					->orderBy('news.time', 'desc')
 					->get();
 
 		return $rs;
